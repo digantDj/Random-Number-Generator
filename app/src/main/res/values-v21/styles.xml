@@ -1,6 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@android:color/transparent</item>
@@ -8,10 +8,11 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:colorForeground">@color/foreground_material_light</item>
         <item name="android:textColorPrimary">@android:color/background_light</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:statusBarColor">@android:color/primary_text_light</item>
         <item name="android:textColorPrimaryInverse">@android:color/background_light</item>
         <item name="android:windowBackground">@drawable/gradient</item>
         <item name="android:colorBackground">@android:color/background_light</item>
         <item name="android:textColorSecondary">@android:color/background_light</item>
     </style>
-
 </resources>
