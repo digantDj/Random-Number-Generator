@@ -12,8 +12,10 @@ import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
+import android.text.Layout;
 import android.text.TextWatcher;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -66,21 +68,25 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-               // minEditText.setText(s);
-                if(!maxEditText.getText().toString().isEmpty() && !minEditText.getText().toString().isEmpty()){
-                    int min = Integer.parseInt(minEditText.getText().toString());
-                    int max = Integer.parseInt(maxEditText.getText().toString());
-                    if(max > min){
-                        allowRandomCompute = true;
-                        messageText.setText("Shake it now!");
-                    }
-                    else{
-                        messageText.setText("Min should be lesser than Max!");
+
+                try {
+                    // minEditText.setText(s);
+                    if (!maxEditText.getText().toString().isEmpty() && !minEditText.getText().toString().isEmpty()) {
+                        int min = Integer.parseInt(minEditText.getText().toString());
+                        int max = Integer.parseInt(maxEditText.getText().toString());
+                        if (max > min) {
+                            allowRandomCompute = true;
+                            messageText.setText("Shake it now!");
+                        } else {
+                            messageText.setText("Min should be lesser than Max!");
+                            allowRandomCompute = false;
+                        }
+                    } else {
                         allowRandomCompute = false;
                     }
                 }
-                else{
-                    allowRandomCompute = false;
+                catch(NumberFormatException e){
+                    messageText.setText("Min Number too long");
                 }
             }
         });
@@ -98,21 +104,25 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-                // minEditText.setText(s);
-                if(!maxEditText.getText().toString().isEmpty() && !minEditText.getText().toString().isEmpty()){
-                    int min = Integer.parseInt(minEditText.getText().toString());
-                    int max = Integer.parseInt(maxEditText.getText().toString());
-                    if(max > min){
-                        allowRandomCompute = true;
-                        messageText.setText("Shake it now!");
-                    }
-                    else{
-                        messageText.setText("Min should be lesser than Max!");
+
+                try {
+                    // minEditText.setText(s);
+                    if (!maxEditText.getText().toString().isEmpty() && !minEditText.getText().toString().isEmpty()) {
+                        int min = Integer.parseInt(minEditText.getText().toString());
+                        int max = Integer.parseInt(maxEditText.getText().toString());
+                        if (max > min) {
+                            allowRandomCompute = true;
+                            messageText.setText("Shake it now!");
+                        } else {
+                            messageText.setText("Min should be lesser than Max!");
+                            allowRandomCompute = false;
+                        }
+                    } else {
                         allowRandomCompute = false;
                     }
                 }
-                else{
-                    allowRandomCompute = false;
+                catch(NumberFormatException e){
+                    messageText.setText("Max Number too long");
                 }
             }
         });
@@ -144,7 +154,27 @@ public class MainActivity extends AppCompatActivity {
         super.onBackPressed();
     }
 
-   private final SensorEventListener sensorListener = new SensorEventListener() {
+    /**
+     * Hides the soft keyboard
+     */
+    public void hideSoftKeyboard() {
+        if(getCurrentFocus()!=null) {
+            InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+            inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        }
+    }
+
+    /**
+     * Shows the soft keyboard
+     */
+    public void showSoftKeyboard(View view) {
+        InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+        view.requestFocus();
+        inputMethodManager.showSoftInput(view, 0);
+    }
+
+
+    private final SensorEventListener sensorListener = new SensorEventListener() {
        @Override
        public void onSensorChanged(SensorEvent sensorEvent) {
 
@@ -156,20 +186,39 @@ public class MainActivity extends AppCompatActivity {
            acelVal = (float) Math.sqrt((double) (x*x + y*y + z*z));
            float delta = acelVal - acelLast;
            shake = shake * 0.9f + delta;
-           if (shake > 12) {
+           if (shake > 10) {
 
 
                if(allowRandomCompute){
+                   hideSoftKeyboard();
                    int minValue = Integer.parseInt(minEditText.getText().toString());
                    int maxValue = Integer.parseInt(maxEditText.getText().toString());
                    int random = new Random().nextInt((maxValue - minValue) + 1) + minValue;
                    resultText.setText(Integer.toString(random));
                    shakeImage.setVisibility(View.INVISIBLE);
                    resultText.setVisibility(View.VISIBLE);
+                   // Check if text is too long
+                   Layout l = resultText.getLayout();
+                   resultText.setTextSize(100);
+                   reduceTextSize(l,0);
                }
               /* Log.d("V", String.valueOf(allowRandomCompute));
                Toast toast = Toast.makeText(getApplicationContext(), "Do not share me" + allowRandomCompute, Toast.LENGTH_SHORT);
                toast.show(); */
+           }
+       }
+
+       private void reduceTextSize(Layout l, int type){
+           int sizeType[] = {70,60,50};
+           if (l != null) {
+               int lines = l.getLineCount();
+               if (lines > 0)
+                   if (l.getEllipsisCount(lines-1) > 0)
+                   {
+                       resultText.setTextSize(sizeType[type]);
+                       if(type < sizeType.length-1)
+                        reduceTextSize(l,type+1);
+                   }
            }
        }
 
