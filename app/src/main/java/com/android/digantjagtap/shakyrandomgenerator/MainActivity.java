@@ -20,14 +20,17 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.startapp.android.publish.adsCommon.StartAppAd;
-import com.startapp.android.publish.adsCommon.StartAppSDK;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
 
 import java.util.Random;
 
+import static com.android.digantjagtap.shakyrandomgenerator.R.id.adView;
+
 public class MainActivity extends AppCompatActivity {
 
-    private StartAppAd startAppAd = new StartAppAd(this);
+    private AdView mAdView;
     private SensorManager sm;
 
     private float acelVal;
@@ -45,9 +48,14 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        StartAppSDK.init(this, "208948028", true);
-        StartAppAd.disableSplash();
         setContentView(R.layout.activity_main);
+
+        MobileAds.initialize(this, "ca-app-pub-5382733936047144~2353664128");
+//ca-app-pub-5382733936047144/2333482829
+        mAdView = (AdView) findViewById(adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
+
 
         messageText = (TextView) findViewById(R.id.messageText);
         minEditText = (EditText) findViewById(R.id.editText);
@@ -139,18 +147,15 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        startAppAd.onResume();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        startAppAd.onPause();
     }
 
     @Override
     public void onBackPressed(){
-        startAppAd.onBackPressed();
         super.onBackPressed();
     }
 
